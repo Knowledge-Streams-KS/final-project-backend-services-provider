@@ -1,4 +1,4 @@
-import userModel from "../models/userModel";
+import userModel from "../models/userModel.js";
 
 //registration controller
 const registerUser = async (req, res) => {

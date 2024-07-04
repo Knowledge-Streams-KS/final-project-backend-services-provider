@@ -1,11 +1,12 @@
-import bookingRoutes from "./bookingRoutes";
-import categoryRoutes from "./categoryRoutes";
-import locationRoutes from "./locationRoutes";
-import paymentRoutes from "./paymentRoutes";
-import providerRoutes from "./providerRoutes";
-import reviewRoutes from "./reviewRoutes";
-import serviceRoutes from "./serviceRoutes";
-import userRoutes from "./userRoutes";
+import express from "express";
+import bookingRoutes from "./bookingRoutes.js";
+import categoryRoutes from "./categoryRoutes.js";
+import locationRoutes from "./locationRoutes.js";
+import paymentRoutes from "./paymentRoutes.js";
+import providerRoutes from "./providerRoutes.js";
+import reviewRoutes from "./reviewRoutes.js";
+import serviceRoutes from "./serviceRoutes.js";
+import userRoutes from "./userRoutes.js";
 
 const allRoutes = express.Router();
 

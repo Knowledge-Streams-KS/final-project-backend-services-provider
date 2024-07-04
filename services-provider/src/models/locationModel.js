@@ -1,4 +1,4 @@
-import { DataType, DataTypes } from "sequelize";
+import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
 
 const locationModel = sequelize.define("Location", {
@@ -15,8 +15,12 @@ const locationModel = sequelize.define("Location", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  coordinates: {
-    type: DataTypes.GEOGRAPHY("POINT"),
+  latitude: {
+    type: DataTypes.DOUBLE,
+    allowNull: false,
+  },
+  longitude: {
+    type: DataTypes.DOUBLE,
     allowNull: false,
   },
 });

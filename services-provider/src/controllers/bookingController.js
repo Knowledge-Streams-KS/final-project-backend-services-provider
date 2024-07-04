@@ -1,4 +1,4 @@
-import bookingModel from "../models/bookingModel";
+import bookingModel from "../models/bookingModel.js";
 
 const createBooking = async (req, res) => {
   const { userId, serviceId, providerId, date, time } = req.body;

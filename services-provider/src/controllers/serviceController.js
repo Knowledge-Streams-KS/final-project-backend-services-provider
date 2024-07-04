@@ -1,4 +1,4 @@
-import serviceModel from "../models/serviceModel";
+import serviceModel from "../models/serviceModel.js";
 
 const createService = async (req, res) => {
   const { serviceName, categoryId, description, price } = req.body;
