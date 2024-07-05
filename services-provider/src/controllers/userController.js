@@ -54,7 +54,6 @@ const registerUser = [
 
 //login controller
 const loginUser = [
-  //validation check
   check("email").isEmail().withMessage("Please include a valid email"),
   check("password").exists().withMessage("Password is required"),
 
@@ -63,11 +62,29 @@ const loginUser = [
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+
     const { email, password } = req.body;
 
     try {
-      const user = await userModel.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email } });
 
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+      res.status(200).json({ token });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+];
 
 const updateUserProfile = [
   check("firstName")
@@ -111,4 +128,3 @@ const updateUserProfile = [
 ];
 
 export { registerUser, loginUser, updateUserProfile };
-
