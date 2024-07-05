@@ -1,4 +1,4 @@
-import providerModel from "../models/providerModel";
+import providerModel from "../models/providerModel.js";
 
 const createProvider = async (req, res) => {
   const { name, expertise, contact } = req.body;

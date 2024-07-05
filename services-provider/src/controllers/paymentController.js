@@ -20,7 +20,7 @@ const createPayment = async (req, res) => {
   }
 };
 
-const getPayment = async (req, res) => {
+const getPayments = async (req, res) => {
   try {
     const payments = await paymentModel.findAll();
     res.status(200).json(payments);
@@ -29,4 +29,4 @@ const getPayment = async (req, res) => {
   }
 };
 
-export { createPayment, getPayment };
+export { createPayment, getPayments };
