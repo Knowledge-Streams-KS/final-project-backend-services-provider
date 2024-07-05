@@ -27,29 +27,41 @@ const registerUser = async (req, res) => {
   }
 };
 
-//login controller
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+// Login User
+const loginUser = [
+  check("email").isEmail().withMessage("Please include a valid email"),
+  check("password").exists().withMessage("Password is required"),
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
-  }
-  try {
-    const user = await userModel.findOne({ where: { email } });
-
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: "Invalid email or password" });
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expireIn: "1h",
-    });
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: "invalid email or password" });
-  }
-};
+    const { email, password } = req.body;
 
+    try {
+      const user = await User.findOne({ where: { email } });
+
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+      res.status(200).json({ token });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+];
+
+// Update User Profile
 const updateUserProfile = [
   check("firstName")
     .optional()
@@ -58,24 +70,28 @@ const updateUserProfile = [
     .withMessage("First name is required"),
   check("email")
     .optional()
-    .ismail()
+    .isEmail()
     .withMessage("Please include a valid email"),
   check("password")
-    .option()
+    .optional()
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
+
   async (req, res) => {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+
     const { firstName, lastName, email, password, phoneNumber, address } =
       req.body;
+
     try {
-      const user = await userModel.findByPk(req.user.id);
+      const user = await User.findByPk(req.user.id);
       if (!user) {
-        return res.status(404).json({ message: "user not found" });
+        return res.status(404).json({ message: "User not found" });
       }
+
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (email) user.email = email;
@@ -84,7 +100,7 @@ const updateUserProfile = [
       if (address) user.address = address;
 
       await user.save();
-      res.status(200).json({ message: "Profile update successfully" });
+      res.status(200).json({ message: "Profile updated successfully" });
     } catch (error) {
       res.status(500).json({ message: "Server error" });
     }
