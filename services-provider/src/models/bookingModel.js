@@ -26,6 +26,10 @@ const bookingModel = sequelize.define("Booking", {
     type: DataTypes.TIME,
     allowNull: false,
   },
+  status: {
+    type: DataTypes.STRING,
+    defaultValue: "pending",
+  },
 });
 
 export default bookingModel;
