@@ -8,12 +8,13 @@ const userRouter = express.Router();
 userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
 
-userRouter.get;
-"/admin",
+userRouter.get(
+  "/admin",
   authMiddleware,
   roleMiddleware("admin"),
   (req, res) => {
     res.send("Admin content");
-  };
+  }
+);
 
 export default userRouter;
