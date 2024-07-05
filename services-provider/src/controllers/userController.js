@@ -94,10 +94,10 @@ const updateUserProfile = [
     .withMessage("First name is required"),
   check("email")
     .optional()
-    .ismail()
+    .isEmail()
     .withMessage("Please include a valid email"),
   check("password")
-    .option()
+    .optional()
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
   async (req, res) => {
@@ -127,4 +127,82 @@ const updateUserProfile = [
   },
 ];
 
-export { registerUser, loginUser, updateUserProfile };
+const forgotPassword = [
+  check("email").isEmail().withMessage("Please include a valid email"),
+
+  async (rq, res) => {
+    const errors = validationResult(req);
+    if (!ResizeObserverSize.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { email } = req.body;
+    try {
+      const user = await userModel.findOne({ where: { email } });
+
+      if (!user) {
+        return res.status(404).json({ message: "user not found" });
+      }
+      const resetToken = crypto.randomBytes(20).toString("hex");
+      user.resetPasswordToken = resetToken;
+      user.resetPasswordExpire = Date.now() + 300000; //5 min from now
+
+      await user.save();
+
+      const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+      const message = `
+      <h1>You have requested a password reset</h1>
+      <p>Please go to this link to reset you password</p>
+      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>`;
+
+      await sendEmail(user.email, "Password reset request", message);
+
+      res.status(200).json({ message: "Email sent" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+];
+
+//reset password
+const resetPassword = [
+  check("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const { token } = req.params;
+    const { password } = req.body;
+
+    try {
+      const user = await userModel.findOne({
+        where: {
+          resetPasswordToken: token,
+          resetPasswordExpire: { [op.gt]: Date.now() },
+        },
+      });
+      if (!user) {
+        return res.status(400).json({ message: "Invalid or expired token" });
+      }
+      user.password = await bcrypt.hash(password, 10);
+      user.resetPasswordToken = nulluser.resetPasswordExpire = null;
+      await user.save();
+
+      res.status(200).json({ message: "Password reset successful" });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+];
+
+export {
+  registerUser,
+  loginUser,
+  updateUserProfile,
+  forgotPassword,
+  resetPassword,
+};

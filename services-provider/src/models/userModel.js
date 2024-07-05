@@ -33,6 +33,12 @@ const userModel = sequelize.define("User", {
   address: {
     type: DataTypes.STRING,
   },
+  resetPasswordToken: {
+    type: DataTypes.STRING,
+  },
+  resetPasswordExpire: {
+    type: DataTypes.DATE,
+  },
 });
 
 export default userModel;
