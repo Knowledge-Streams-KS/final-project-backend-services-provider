@@ -1,12 +1,12 @@
 import express from "express";
-import bookingRoutes from "./bookingRoutes.js";
+import userRoutes from "./userRoutes.js";
 import categoryRoutes from "./categoryRoutes.js";
-import locationRoutes from "./locationRoutes.js";
-import paymentRoutes from "./paymentRoutes.js";
+import serviceRoutes from "./serviceRoutes.js";
+import bookingRoutes from "./bookingRoutes.js";
 import providerRoutes from "./providerRoutes.js";
 import reviewRoutes from "./reviewRoutes.js";
-import serviceRoutes from "./serviceRoutes.js";
-import userRoutes from "./userRoutes.js";
+import locationRoutes from "./locationRoutes.js";
+import paymentRoutes from "./paymentRoutes.js";
 
 const allRoutes = express.Router();
 
