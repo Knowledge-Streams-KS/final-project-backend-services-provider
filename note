@@ -39,6 +39,8 @@ services-provider/
 │   └── userRoutes.js
 ├── utils/
 │   └── email.js
+├── App.js
+├── script.js
 ├── .env
 ├── package.json
 └── server.js
