@@ -1,24 +1,6 @@
 import serviceModel from "../models/serviceModel.js";
 
-const createService = async (req, res) => {
-  const { serviceName, categoryId, description, price } = req.body;
-
-  if (!serviceName || !categoryId || !description || !price) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-  try {
-    const service = await serviceModel.create({
-      serviceName,
-      categoryId,
-      description,
-      price,
-    });
-    res.status(200).json(service);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
+// Get all services
 const getServices = async (req, res) => {
   try {
     const services = await serviceModel.findAll();
@@ -27,22 +9,42 @@ const getServices = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get service by ID
+const getServiceById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const service = await serviceModel.findByPk(id);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+    res.status(200).json(service);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Create a new service
+const createService = async (req, res) => {
+  const { name, description, price } = req.body;
+  try {
+    const newService = await serviceModel.create({ name, description, price });
+    res.status(201).json(newService);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Update a service
 const updateService = async (req, res) => {
   const { id } = req.params;
-  const { serviceName, categoryId, description, price } = req.body;
-
-  if (!serviceName || !categoryId || !description || !price) {
-    return res.status(400).json({ message: "All fields are required." });
-  }
-
+  const { name, description, price } = req.body;
   try {
-    const service = await Service.findByPk(id);
+    const service = await serviceModel.findByPk(id);
     if (!service) {
-      return res.status(404).json({ message: "Service not found." });
+      return res.status(404).json({ message: "Service not found" });
     }
-
-    service.serviceName = serviceName;
-    service.categoryId = categoryId;
+    service.name = name;
     service.description = description;
     service.price = price;
     await service.save();
@@ -52,20 +54,25 @@ const updateService = async (req, res) => {
   }
 };
 
+// Delete a service
 const deleteService = async (req, res) => {
   const { id } = req.params;
-
   try {
-    const service = await Service.findByPk(id);
+    const service = await serviceModel.findByPk(id);
     if (!service) {
-      return res.status(404).json({ message: "Service not found." });
+      return res.status(404).json({ message: "Service not found" });
     }
-
     await service.destroy();
-    res.status(200).json({ message: "Service deleted successfully." });
+    res.status(200).json({ message: "Service deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-export { createService, getServices, updateService, deleteService };
+export {
+  getServices,
+  getServiceById,
+  createService,
+  updateService,
+  deleteService,
+};

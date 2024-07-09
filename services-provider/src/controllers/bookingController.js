@@ -18,6 +18,8 @@ const createBooking = async (req, res) => {
     });
     res.status(200).json(booking);
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({ message: "error.message" });
   }
 };
@@ -44,6 +46,7 @@ const confirmBooking = async (req, res) => {
     await booking.save();
     res.status(200).json({ message: "Booking confirmed." });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -61,6 +64,7 @@ const cancelBooking = async (req, res) => {
     await booking.save();
     res.status(200).json({ message: "Booking canceled" });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -83,6 +87,7 @@ const rescheduleBooking = async (req, res) => {
     await booking.save();
     res.status(200).json({ message: "Booking rescheduled." });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: error.message });
   }
 };

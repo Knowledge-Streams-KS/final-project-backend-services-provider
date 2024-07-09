@@ -2,28 +2,31 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { check, validationResult } from "express-validator";
 import userModel from "../models/userModel.js";
+import crypto from "crypto";
+import sendEmail from "../utils/email.js";
+import { Op } from "sequelize";
 
-//registration controller
+// Registration Controller
 const registerUser = [
   check("firstName").not().isEmpty().withMessage("First name is required"),
-  check("email").isEmail().withMessage("Please include a valid email "),
+  check("email").isEmail().withMessage("Please include a valid email"),
   check("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
-
+  check("role")
+    .isIn(["customer", "provider"])
+    .withMessage("Role must be either 'customer' or 'provider'"),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array });
+      return res.status(400).json({ errors: errors.array() });
     }
-    const { firstName, lastName, email, password, phoneNumber, address } =
+    const { firstName, lastName, email, password, phoneNumber, address, role } =
       req.body;
-
     try {
       let user = await userModel.findOne({ where: { email } });
-
       if (user) {
-        return res.status(400).json({ message: "Usr already exist" });
+        return res.status(400).json({ message: "User already exists" });
       }
       const hashedPassword = await bcrypt.hash(password, 10);
       user = await userModel.create({
@@ -33,6 +36,7 @@ const registerUser = [
         password: hashedPassword,
         phoneNumber,
         address,
+        role,
       });
 
       const payload = {
@@ -47,31 +51,27 @@ const registerUser = [
       });
       res.status(200).json({ token });
     } catch (error) {
+      console.error(error);
       res.status(500).json({ message: error.message });
     }
   },
 ];
 
-//login controller
+// Login Controller
 const loginUser = [
   check("email").isEmail().withMessage("Please include a valid email"),
   check("password").exists().withMessage("Password is required"),
-
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { email, password } = req.body;
-
     try {
-      const user = await User.findOne({ where: { email } });
-
+      const user = await userModel.findOne({ where: { email } });
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
-
       const token = jwt.sign(
         { userId: user.id, role: user.role },
         process.env.JWT_SECRET,
@@ -85,7 +85,19 @@ const loginUser = [
     }
   },
 ];
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await userModel.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
+// Update User Profile Controller
 const updateUserProfile = [
   check("firstName")
     .optional()
@@ -101,8 +113,8 @@ const updateUserProfile = [
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
   async (req, res) => {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
     const { firstName, lastName, email, password, phoneNumber, address } =
@@ -110,7 +122,7 @@ const updateUserProfile = [
     try {
       const user = await userModel.findByPk(req.user.id);
       if (!user) {
-        return res.status(404).json({ message: "user not found" });
+        return res.status(404).json({ message: "User not found" });
       }
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
@@ -118,45 +130,40 @@ const updateUserProfile = [
       if (password) user.password = await bcrypt.hash(password, 10);
       if (phoneNumber) user.phoneNumber = phoneNumber;
       if (address) user.address = address;
-
       await user.save();
-      res.status(200).json({ message: "Profile update successfully" });
+      res.status(200).json({ message: "Profile updated successfully" });
     } catch (error) {
       res.status(500).json({ message: "Server error" });
     }
   },
 ];
 
+// Forgot Password Controller
 const forgotPassword = [
   check("email").isEmail().withMessage("Please include a valid email"),
-
-  async (rq, res) => {
+  async (req, res) => {
     const errors = validationResult(req);
-    if (!ResizeObserverSize.isEmpty()) {
+    if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-
     const { email } = req.body;
     try {
       const user = await userModel.findOne({ where: { email } });
-
       if (!user) {
-        return res.status(404).json({ message: "user not found" });
+        return res.status(404).json({ message: "User not found" });
       }
       const resetToken = crypto.randomBytes(20).toString("hex");
       user.resetPasswordToken = resetToken;
-      user.resetPasswordExpire = Date.now() + 300000; //5 min from now
-
+      user.resetPasswordExpire = Date.now() + 300000; // 5 minutes from now
       await user.save();
 
       const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
       const message = `
-      <h1>You have requested a password reset</h1>
-      <p>Please go to this link to reset you password</p>
-      <a href=${resetUrl} clicktracking=off>${resetUrl}</a>`;
-
+        <h1>You have requested a password reset</h1>
+        <p>Please go to this link to reset your password</p>
+        <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
+      `;
       await sendEmail(user.email, "Password reset request", message);
-
       res.status(200).json({ message: "Email sent" });
     } catch (error) {
       res.status(500).json({ message: "Server error" });
@@ -164,12 +171,11 @@ const forgotPassword = [
   },
 ];
 
-//reset password
+// Reset Password Controller
 const resetPassword = [
   check("password")
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
-
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -177,21 +183,20 @@ const resetPassword = [
     }
     const { token } = req.params;
     const { password } = req.body;
-
     try {
       const user = await userModel.findOne({
         where: {
           resetPasswordToken: token,
-          resetPasswordExpire: { [op.gt]: Date.now() },
+          resetPasswordExpire: { [Op.gt]: Date.now() },
         },
       });
       if (!user) {
         return res.status(400).json({ message: "Invalid or expired token" });
       }
       user.password = await bcrypt.hash(password, 10);
-      user.resetPasswordToken = nulluser.resetPasswordExpire = null;
+      user.resetPasswordToken = null;
+      user.resetPasswordExpire = null;
       await user.save();
-
       res.status(200).json({ message: "Password reset successful" });
     } catch (error) {
       res.status(500).json({ message: "Server error" });
@@ -205,4 +210,5 @@ export {
   updateUserProfile,
   forgotPassword,
   resetPassword,
+  getUserProfile,
 };

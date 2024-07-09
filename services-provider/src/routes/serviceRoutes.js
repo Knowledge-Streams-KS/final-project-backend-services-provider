@@ -1,12 +1,30 @@
 import express from "express";
 import {
-  createService,
   getServices,
+  getServiceById,
+  createService,
+  updateService,
+  deleteService,
 } from "../controllers/serviceController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const serviceRouter = express.Router();
 
-serviceRouter.post("/create", createService);
 serviceRouter.get("/", getServices);
+serviceRouter.get("/:id", getServiceById);
+serviceRouter.post("/", authMiddleware, roleMiddleware("admin"), createService);
+serviceRouter.put(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  updateService
+);
+serviceRouter.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware("admin"),
+  deleteService
+);
 
 export default serviceRouter;

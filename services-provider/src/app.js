@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(logger);
 app.use(morgan("dev"));
 
-app.use("api/", allRoutes);
+app.use("/api", allRoutes);
 
 connectDB();
 syncDb();
