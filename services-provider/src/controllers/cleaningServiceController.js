@@ -1,5 +1,3 @@
-// src/controllers/cleaningServiceController.js
-
 import CleaningService from "../models/cleaningServicesModel.js";
 
 const getAllCleaningServices = async (req, res) => {

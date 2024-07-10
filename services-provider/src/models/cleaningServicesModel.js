@@ -1,14 +1,16 @@
 // src/models/cleaningServiceModel.js
-
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
+import Category from "./categoryModels.js";
+import Location from "./locationModel.js";
+import Provider from "./providerModel.js";
 
-const CleaningServiceModel = sequelize.define(
+const CleaningService = sequelize.define(
   "CleaningService",
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {
@@ -23,10 +25,34 @@ const CleaningServiceModel = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    categoryId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: Category,
+        key: "id",
+      },
+    },
+    locationId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: Location,
+        key: "id",
+      },
+    },
+    providerId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      references: {
+        model: Provider,
+        key: "id",
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export default CleaningServiceModel;
+export default CleaningService;

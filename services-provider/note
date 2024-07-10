@@ -1,0 +1,60 @@
+src(B-E)
+└── src
+    ├── app.js
+    ├── controllers
+    │   ├── bookingController.js
+    │   ├── categoryController.js
+    │   ├── cleaningServiceController.js
+    │   ├── homeInspectionController.js
+    │   ├── homeServiceController.js
+    │   ├── locationController.js
+    │   ├── paymentController.js
+    │   ├── PersonalServiceController.js
+    │   ├── providerController.js
+    │   ├── reviewController.js
+    │   ├── serviceController.js
+    │   ├── solarServiceController.js
+    │   └── userController.js
+    ├── db
+    │   ├── config.js
+    │   └── init.js
+    ├── middlewares
+    │   ├── authMiddleware.js
+    │   ├── loggerMiddleware.js
+    │   ├── roleMiddleware.js
+    │   └── validateMiddleware.js
+    ├── models
+    │   ├── associations.js
+    │   ├── bookingModel.js
+    │   ├── categoryModels.js
+    │   ├── cleaningServicesModel.js
+    │   ├── homeInspectionModel.js
+    │   ├── homeServiceModel.js
+    │   ├── locationModel.js
+    │   ├── paymentModel.js
+    │   ├── personalServiceModel.js
+    │   ├── providerModel.js
+    │   ├── reviewModel.js
+    │   ├── serviceModel.js
+    │   ├── solarServiceModel.js
+    │   └── userModel.js
+    ├── routes
+    │   ├── allRoutes.js
+    │   ├── bookingRoutes.js
+    │   ├── categoryRoutes.js
+    │   ├── cleaningServicesRoutes.js
+    │   ├── homeInspectionRoutes.js
+    │   ├── homeServiceRoutes.js
+    │   ├── locationRoutes.js
+    │   ├── paymentRoutes.js
+    │   ├── personalServiceRoutes.js
+    │   ├── providerRoutes.js
+    │   ├── reviewRoutes.js
+    │   ├── serviceRoutes.js
+    │   ├── solarServiceRoutes.js
+    │   └── userRoutes.js
+    ├── scripts
+    │   └── createAdmin.js
+    └── utils
+        ├── email.js
+        └── logger.js

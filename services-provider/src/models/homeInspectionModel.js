@@ -1,14 +1,16 @@
 // src/models/homeInspectionModel.js
-
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
+import Category from "./categoryModels.js";
+import Location from "./locationModel.js";
+import Provider from "./providerModel.js";
 
-const homeInspection = sequelize.define(
+const HomeInspection = sequelize.define(
   "HomeInspection",
   {
     id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
     name: {
@@ -24,23 +26,26 @@ const homeInspection = sequelize.define(
       allowNull: false,
     },
     categoryId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: "categories",
+        model: Category,
         key: "id",
       },
     },
     locationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: "locations",
+        model: Location,
         key: "id",
       },
     },
     providerId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      allowNull: false,
       references: {
-        model: "providers",
+        model: Provider,
         key: "id",
       },
     },
@@ -50,4 +55,4 @@ const homeInspection = sequelize.define(
   }
 );
 
-export default homeInspection;
+export default HomeInspection;

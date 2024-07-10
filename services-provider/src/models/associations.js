@@ -1,118 +1,117 @@
-import categoryModel from "./categoryModels";
-import serviceModel from "./serviceModel";
-import userModel from "./userModel";
-import bookingModel from "./bookingModel";
-import providerModel from "./providerModel";
-import reviewModel from "./reviewModel";
-import locationModel from "./locationModel";
-import paymentModel from "./paymentModel";
-const homeServiceModel = require("./homeServiceModel");
-const cleaningServiceModel = require("./cleaningServiceModel");
-const personalServiceModel = require("./personalServiceModel");
-const solarServiceModel = require("./solarServiceModel");
-const homeInspectionModel = require("./homeInspectionModel");
+import userModel from "./userModel.js";
+import bookingModel from "./bookingModel.js";
+import serviceModel from "./serviceModel.js";
+import providerModel from "./providerModel.js";
+import categoryModel from "./categoryModels.js";
+import locationModel from "./locationModel.js";
+import paymentModel from "./paymentModel.js";
+import PersonalService from "./personalServiceModel.js";
+import CleaningServiceModel from "./cleaningServicesModel.js";
+import homeInspection from "./homeInspectionModel.js";
+import HomeService from "./homeServiceModel.js";
+import SolarService from "./solarServiceModel.js";
+import reviewModel from "./reviewModel.js";
 
+// Define associations in the correct order
+
+// Category and Service
 categoryModel.hasMany(serviceModel, { foreignKey: "categoryId" });
 serviceModel.belongsTo(categoryModel, { foreignKey: "categoryId" });
 
-userModel.hasMany(bookingModel, { foreignKey: "userId" });
-bookingModel.belongsTo(userModel, { foreignKey: "userId" });
-
-serviceModel.hasMany(bookingModel, { foreignKey: "serviceId" });
-bookingModel.belongsTo((serviceModel, { foreignKey: "serviceId" }));
-
-providerModel.hasMany(bookingModel, { foreignKey: " providerId " });
-bookingModel.belongsTo(providerModel, { foreignKey: "providerId" });
-
-serviceModel.hasMany(reviewModel, { foreignKey: "serviceId" });
-reviewModel.belongsTo(serviceModel, { foreignKey: "serviceId" });
-
-userModel.hasMany(reviewModel, { foreignKey: "userId" });
-reviewModel.belongsTo(userModel, { foreignKey: "userId" });
-
+// Location and Service
 locationModel.hasMany(serviceModel, { foreignKey: "locationId" });
 serviceModel.belongsTo(locationModel, { foreignKey: "locationId" });
 
+// User and Booking
+userModel.hasMany(bookingModel, { foreignKey: "userId" });
+bookingModel.belongsTo(userModel, { foreignKey: "userId" });
+
+// Service and Booking
+serviceModel.hasMany(bookingModel, { foreignKey: "serviceId" });
+bookingModel.belongsTo(serviceModel, { foreignKey: "serviceId" });
+
+// Provider and Booking
+providerModel.hasMany(bookingModel, { foreignKey: "providerId" });
+bookingModel.belongsTo(providerModel, { foreignKey: "providerId" });
+
+// Booking and Payment
 bookingModel.hasMany(paymentModel, { foreignKey: "bookingId" });
 paymentModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
 
-categoryModel.hasMany(homeServiceModel, { foreignKey: "categoryId" });
-homeServiceModel.belongsTo(categoryModel, { foreignKey: "categoryId" });
+// Service and Review
+serviceModel.hasMany(reviewModel, { foreignKey: "serviceId" });
+reviewModel.belongsTo(serviceModel, { foreignKey: "serviceId" });
 
-userModel.hasMany(homeServiceModel, { foreignKey: "userId" });
-homeServiceModel.belongsTo(userModel, { foreignKey: "userId" });
+// User and Review
+userModel.hasMany(reviewModel, { foreignKey: "userId" });
+reviewModel.belongsTo(userModel, { foreignKey: "userId" });
 
-providerModel.hasMany(homeServiceModel, { foreignKey: "providerId" });
-homeServiceModel.belongsTo(providerModel, { foreignKey: "providerId" });
+// HomeService associations
+categoryModel.hasMany(HomeService, { foreignKey: "categoryId" });
+HomeService.belongsTo(categoryModel, { foreignKey: "categoryId" });
 
-locationModel.hasMany(homeServiceModel, { foreignKey: "locationId" });
-homeServiceModel.belongsTo(locationModel, { foreignKey: "locationId" });
+locationModel.hasMany(HomeService, { foreignKey: "locationId" });
+HomeService.belongsTo(locationModel, { foreignKey: "locationId" });
 
-bookingModel.hasMany(homeServiceModel, { foreignKey: "bookingId" });
-homeServiceModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
+providerModel.hasMany(HomeService, { foreignKey: "providerId" });
+HomeService.belongsTo(providerModel, { foreignKey: "providerId" });
 
-categoryModel.hasMany(cleaningServiceModel, { foreignKey: "categoryId" });
-cleaningServiceModel.belongsTo(categoryModel, { foreignKey: "categoryId" });
+bookingModel.hasMany(HomeService, { foreignKey: "bookingId" });
+HomeService.belongsTo(bookingModel, { foreignKey: "bookingId" });
 
-userModel.hasMany(cleaningServiceModel, { foreignKey: "userId" });
-cleaningServiceModel.belongsTo(userModel, { foreignKey: "userId" });
+// CleaningService associations
+categoryModel.hasMany(CleaningServiceModel, { foreignKey: "categoryId" });
+CleaningServiceModel.belongsTo(categoryModel, { foreignKey: "categoryId" });
 
-providerModel.hasMany(cleaningServiceModel, { foreignKey: "providerId" });
-cleaningServiceModel.belongsTo(providerModel, { foreignKey: "providerId" });
+locationModel.hasMany(CleaningServiceModel, { foreignKey: "locationId" });
+CleaningServiceModel.belongsTo(locationModel, { foreignKey: "locationId" });
 
-locationModel.hasMany(cleaningServiceModel, { foreignKey: "locationId" });
-cleaningServiceModel.belongsTo(locationModel, { foreignKey: "locationId" });
+providerModel.hasMany(CleaningServiceModel, { foreignKey: "providerId" });
+CleaningServiceModel.belongsTo(providerModel, { foreignKey: "providerId" });
 
-bookingModel.hasMany(cleaningServiceModel, { foreignKey: "bookingId" });
-cleaningServiceModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
+bookingModel.hasMany(CleaningServiceModel, { foreignKey: "bookingId" });
+CleaningServiceModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
 
-categoryModel.hasMany(personalServiceModel, { foreignKey: "categoryId" });
-personalServiceModel.belongsTo(categoryModel, { foreignKey: "categoryId" });
+// PersonalService associations
+categoryModel.hasMany(PersonalService, { foreignKey: "categoryId" });
+PersonalService.belongsTo(categoryModel, { foreignKey: "categoryId" });
 
-userModel.hasMany(personalServiceModel, { foreignKey: "userId" });
-personalServiceModel.belongsTo(userModel, { foreignKey: "userId" });
+locationModel.hasMany(PersonalService, { foreignKey: "locationId" });
+PersonalService.belongsTo(locationModel, { foreignKey: "locationId" });
 
-providerModel.hasMany(personalServiceModel, { foreignKey: "providerId" });
-personalServiceModel.belongsTo(providerModel, { foreignKey: "providerId" });
+providerModel.hasMany(PersonalService, { foreignKey: "providerId" });
+PersonalService.belongsTo(providerModel, { foreignKey: "providerId" });
 
-locationModel.hasMany(personalServiceModel, { foreignKey: "locationId" });
-personalServiceModel.belongsTo(locationModel, { foreignKey: "locationId" });
+bookingModel.hasMany(PersonalService, { foreignKey: "bookingId" });
+PersonalService.belongsTo(bookingModel, { foreignKey: "bookingId" });
 
-bookingModel.hasMany(personalServiceModel, { foreignKey: "bookingId" });
-personalServiceModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
+// SolarService associations
+categoryModel.hasMany(SolarService, { foreignKey: "categoryId" });
+SolarService.belongsTo(categoryModel, { foreignKey: "categoryId" });
 
-categoryModel.hasMany(solarServiceModel, { foreignKey: "categoryId" });
-solarServiceModel.belongsTo(categoryModel, { foreignKey: "categoryId" });
+locationModel.hasMany(SolarService, { foreignKey: "locationId" });
+SolarService.belongsTo(locationModel, { foreignKey: "locationId" });
 
-userModel.hasMany(solarServiceModel, { foreignKey: "userId" });
-solarServiceModel.belongsTo(userModel, { foreignKey: "userId" });
+providerModel.hasMany(SolarService, { foreignKey: "providerId" });
+SolarService.belongsTo(providerModel, { foreignKey: "providerId" });
 
-providerModel.hasMany(solarServiceModel, { foreignKey: "providerId" });
-solarServiceModel.belongsTo(providerModel, { foreignKey: "providerId" });
+bookingModel.hasMany(SolarService, { foreignKey: "bookingId" });
+SolarService.belongsTo(bookingModel, { foreignKey: "bookingId" });
 
-locationModel.hasMany(solarServiceModel, { foreignKey: "locationId" });
-solarServiceModel.belongsTo(locationModel, { foreignKey: "locationId" });
+// HomeInspection associations
+categoryModel.hasMany(homeInspection, { foreignKey: "categoryId" });
+homeInspection.belongsTo(categoryModel, { foreignKey: "categoryId" });
 
-bookingModel.hasMany(solarServiceModel, { foreignKey: "bookingId" });
-solarServiceModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
+locationModel.hasMany(homeInspection, { foreignKey: "locationId" });
+homeInspection.belongsTo(locationModel, { foreignKey: "locationId" });
 
-categoryModel.hasMany(homeInspectionModel, { foreignKey: "categoryId" });
-homeInspectionModel.belongsTo(Category, { foreignKey: "categoryId" });
+providerModel.hasMany(homeInspection, { foreignKey: "providerId" });
+homeInspection.belongsTo(providerModel, { foreignKey: "providerId" });
 
-userModel.hasMany(homeInspectionModel, { foreignKey: "userId" });
-homeInspectionModel.belongsTo(userModel, { foreignKey: "userId" });
-
-providerModel.hasMany(homeInspectionModel, { foreignKey: "providerId" });
-homeInspectionModel.belongsTo(providerModel, { foreignKey: "providerId" });
-
-locationModel.hasMany(homeInspectionModel, { foreignKey: "locationId" });
-homeInspectionModel.belongsTo(locationModel, { foreignKey: "locationId" });
-
-bookingModel.hasMany(homeInspectionModel, { foreignKey: "bookingId" });
-homeInspectionModel.belongsTo(bookingModel, { foreignKey: "bookingId" });
+bookingModel.hasMany(homeInspection, { foreignKey: "bookingId" });
+homeInspection.belongsTo(bookingModel, { foreignKey: "bookingId" });
 
 export {
-  sequelize,
   userModel,
   categoryModel,
   serviceModel,
@@ -121,9 +120,9 @@ export {
   reviewModel,
   locationModel,
   paymentModel,
-  homeServiceModel,
-  homeInspectionModel,
-  personalServiceModel,
-  cleaningServiceModel,
-  solarServiceModel,
+  HomeService,
+  homeInspection,
+  PersonalService,
+  CleaningServiceModel,
+  SolarService,
 };

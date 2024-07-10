@@ -1,7 +1,8 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
+import Category from "./categoryModels.js";
 
-const serviceModel = sequelize.define("Services", {
+const Service = sequelize.define("Service", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -12,8 +13,12 @@ const serviceModel = sequelize.define("Services", {
     allowNull: false,
   },
   categoryId: {
-    type: DataTypes.UUID,
+    type: DataTypes.UUID, // Ensure this matches the referenced model's data type
     allowNull: false,
+    references: {
+      model: Category,
+      key: "id",
+    },
   },
   description: {
     type: DataTypes.TEXT,
@@ -25,4 +30,4 @@ const serviceModel = sequelize.define("Services", {
   },
 });
 
-export default serviceModel;
+export default Service;
