@@ -1,27 +1,44 @@
 import providerModel from "../models/providerModel.js";
+import providerSchema from "../middlewares/schemas/providerSchema.js";
 
-const createProvider = async (req, res) => {
-  const { name, expertise, contact } = req.body;
+const providerController = {
+  createProvider: async (req, res) => {
+    const { error } = providerSchema.createProviderSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if (error) {
+      return res
+        .status(400)
+        .json({ errors: error.details.map((err) => err.message) });
+    }
 
-  if (!name || !expertise || !contact) {
-    return res.status(400).json({ message: "All fields are require" });
-  }
+    try {
+      const { name, contact } = req.body;
 
-  try {
-    const provider = await providerModel.create({ name, expertise, contact });
-    res.status(200).json(provider);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+      // Check if provider already exists
+      const existingProvider = await providerModel.findOne({
+        where: { name, contact },
+      });
+      if (existingProvider) {
+        return res.status(400).json({ message: "Provider already exists" });
+      }
+
+      // Create new provider
+      const provider = await providerModel.create({ name, contact });
+      res.status(201).json(provider);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  getProviders: async (req, res) => {
+    try {
+      const providers = await providerModel.findAll();
+      res.status(200).json(providers);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
-const getProviders = async (rq, res) => {
-  try {
-    const providers = await providerModel.findAll();
-    res.status(200).json(providers);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export { createProvider, getProviders };
+export default providerController;

@@ -11,16 +11,6 @@ const Payment = sequelize.define(
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
-    bookingId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: Booking,
-        key: "id",
-      },
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    },
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
@@ -38,5 +28,7 @@ const Payment = sequelize.define(
     timestamps: true,
   }
 );
+
+Payment.belongsTo(Booking, { foreignKey: "bookingId" });
 
 export default Payment;

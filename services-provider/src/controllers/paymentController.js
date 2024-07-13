@@ -1,32 +1,36 @@
 import paymentModel from "../models/paymentModel.js";
+import paymentSchema from "../middlewares/schemas/paymentSchema.js";
 
-const createPayment = async (req, res) => {
-  const { bookingId, amount, method, status } = req.body;
+const paymentController = {
+  createPayment: async (req, res) => {
+    const { error } = paymentSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ errors: error.details });
+    }
 
-  if (!bookingId || !amount || !method || !status) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+    const { bookingId, amount, method, status } = req.body;
 
-  try {
-    const payment = await paymentModel.create({
-      bookingId,
-      amount,
-      method,
-      status,
-    });
-    res.status(200).json(payment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    try {
+      const payment = await paymentModel.create({
+        bookingId,
+        amount,
+        method,
+        status,
+      });
+      res.status(201).json(payment);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  getPayments: async (req, res) => {
+    try {
+      const payments = await paymentModel.findAll();
+      res.status(200).json(payments);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
-const getPayments = async (req, res) => {
-  try {
-    const payments = await paymentModel.findAll();
-    res.status(200).json(payments);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export { createPayment, getPayments };
+export default paymentController;

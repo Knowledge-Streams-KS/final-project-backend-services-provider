@@ -1,32 +1,35 @@
 import reviewModel from "../models/reviewModel.js";
+import reviewSchema from "../middlewares/schemas/reviewSchema.js";
 
-const createReview = async (req, res) => {
-  const { userId, serviceId, rating, comment } = req.body;
+const reviewController = {
+  createReview: async (req, res) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ errors: error.details });
+    }
 
-  if (!userId || !serviceId || !rating || !comment) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
+    try {
+      const { userId, serviceId, rating, comment } = req.body;
+      const review = await reviewModel.create({
+        userId,
+        serviceId,
+        rating,
+        comment,
+      });
+      res.status(200).json(review);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 
-  try {
-    const review = await reviewModel.create({
-      userId,
-      serviceId,
-      rating,
-      comment,
-    });
-    res.status(200).json(review);
-  } catch (error) {
-    res.status(500).json({ message: "error.message" });
-  }
+  getReviews: async (req, res) => {
+    try {
+      const reviews = await reviewModel.findAll();
+      res.status(200).json(reviews);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
-const getReviews = async (req, res) => {
-  try {
-    const reviews = await reviewModel.findAll();
-    res.status(200).json(reviews);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export { createReview, getReviews };
+export default reviewController;

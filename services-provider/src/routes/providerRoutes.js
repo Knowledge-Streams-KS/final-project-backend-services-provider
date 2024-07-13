@@ -1,12 +1,18 @@
 import express from "express";
-import {
-  createProvider,
-  getProviders,
-} from "../controllers/providerController.js";
+import providerController from "../controllers/providerController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const providerRouter = express.Router();
 
-providerRouter.post("/create", createProvider);
-providerRouter.get("/", getProviders);
+providerRouter.post(
+  "/create-provider",
+  authMiddleware,
+  providerController.createProvider
+);
+providerRouter.get(
+  "/get-provider",
+  authMiddleware,
+  providerController.getProviders
+);
 
 export default providerRouter;

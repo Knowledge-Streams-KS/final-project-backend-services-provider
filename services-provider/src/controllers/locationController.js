@@ -1,27 +1,31 @@
 import locationModel from "../models/locationModel.js";
 
-const createLocation = async (req, res) => {
-  const { city, area, coordinates } = req.body;
+import locationSchema from "../middlewares/schemas/locationSchema.js";
+const locationController = {
+  createLocation: async (req, res) => {
+    const { error } = locationSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ errors: error.details });
+    }
 
-  if (!city || !area || !coordinates) {
-    return res.status(400).json({ message: "Al fields are required" });
-  }
+    const { name } = req.body;
 
-  try {
-    const location = await locationModel.create({ city, area, coordinates });
-    res.status(200).json(location);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    try {
+      const location = await locationModel.create({ name });
+      res.status(201).json(location);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  getLocation: async (req, res) => {
+    try {
+      const locations = await locationModel.findAll();
+      res.status(200).json(locations);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
-const getLocation = async (req, res) => {
-  try {
-    const location = await locationModel.findAll();
-    res.status(200).json(location);
-  } catch (error) {
-    res.status(500).json({ message: "error.message" });
-  }
-};
-
-export { createLocation, getLocation };
+export default locationController;

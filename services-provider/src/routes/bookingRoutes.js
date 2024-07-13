@@ -1,25 +1,21 @@
 import express from "express";
-import {
-  cancelBooking,
-  confirmBooking,
-  createBooking,
-  getBookings,
-  rescheduleBooking,
-} from "../controllers/bookingController.js";
+import bookingController from "../controllers/bookingController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const bookingRouter = express.Router();
 
-bookingRouter.post("/", authMiddleware, createBooking);
-bookingRouter.get("/", authMiddleware, getBookings);
-bookingRouter.put(
-  "/confirm/:id",
+bookingRouter.post(
+  "/create-booking",
   authMiddleware,
-  roleMiddleware("admin"),
-  confirmBooking
+  bookingController.createBooking
 );
-bookingRouter.put("/cancel/:id", authMiddleware, cancelBooking);
-bookingRouter.put("/reschedule/:id", authMiddleware, rescheduleBooking);
+
+bookingRouter.put(
+  "/reschedule-booking/:id",
+  authMiddleware,
+  bookingController.rescheduleBooking
+);
+
+bookingRouter.get("/", authMiddleware, bookingController.getAllBookings);
 
 export default bookingRouter;

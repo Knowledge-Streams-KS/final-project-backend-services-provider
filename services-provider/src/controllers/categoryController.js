@@ -1,64 +1,87 @@
-import categoryModel from "../models/categoryModels.js";
+import Category from "../models/categoryModels.js";
+import createCategorySchema from "../middlewares/schemas/categorySchema.js";
 
-const createCategory = async (req, res) => {
-  const { categoryName } = req.body;
-
-  if (!categoryName) {
-    return res.status(400).json({ message: "category name is required" });
-  }
-
-  try {
-    const category = await categoryModel.create({ category });
-    res.status(200).json(category);
-  } catch (error) {
-    res.status(500).json({ message: "error.message" });
-  }
-};
-
-const getCategories = async (req, res) => {
-  try {
-    const categories = await categoryModel.findAll();
-    res.status(200).json(categories);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-const updateCategory = async (req, res) => {
-  const { id } = req.params;
-  const { categoryName } = req.body;
-
-  if (!categoryName) {
-    return res.status(400).json({ message: "Category name is required." });
-  }
-
-  try {
-    const category = await Category.findByPk(id);
-    if (!category) {
-      return res.status(404).json({ message: "Category not found." });
+const categoryController = {
+  // Create Category
+  createCategory: async (req, res) => {
+    const { error } = createCategorySchema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .json({ errors: error.details.map((err) => err.message) });
     }
 
-    category.categoryName = categoryName;
-    await category.save();
-    res.status(200).json(category);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+    const { categoryName } = req.body;
 
-const deleteCategory = async (req, res) => {
-  const { id } = req.params;
+    try {
+      // Check if category already exists
+      const existingCategory = await Category.findOne({
+        where: { categoryName },
+      });
+      if (existingCategory) {
+        return res.status(400).json({ message: "Category already exists" });
+      }
 
-  try {
-    const category = await Category.findByPk(id);
-    if (!category) {
-      return res.status(404).json({ message: "Category not found." });
+      // Create new category
+      const category = await Category.create({ categoryName });
+      res.status(201).json(category);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Get Categories
+  getCategories: async (req, res) => {
+    try {
+      const categories = await Category.findAll();
+      res.status(200).json(categories);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Update Category
+  updateCategory: async (req, res) => {
+    const { id } = req.params;
+    const { error } = createCategorySchema.validate(req.body);
+    if (error) {
+      return res
+        .status(400)
+        .json({ errors: error.details.map((err) => err.message) });
     }
 
-    await category.destroy();
-    res.status(200).json({ message: "Category deleted successfully." });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+    const { categoryName } = req.body;
+
+    try {
+      const category = await Category.findByPk(id);
+      if (!category) {
+        return res.status(404).json({ message: "Category not found." });
+      }
+
+      category.categoryName = categoryName;
+      await category.save();
+      res.status(200).json(category);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  // Delete Category
+  deleteCategory: async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const category = await Category.findByPk(id);
+      if (!category) {
+        return res.status(404).json({ message: "Category not found." });
+      }
+
+      await category.destroy();
+      res.status(200).json({ message: "Category deleted successfully." });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
-export { createCategory, getCategories, updateCategory, deleteCategory };
+export default categoryController;

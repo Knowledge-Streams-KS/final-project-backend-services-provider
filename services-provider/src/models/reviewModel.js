@@ -5,28 +5,12 @@ import User from "./userModel.js";
 import Service from "./serviceModel.js";
 
 const Review = sequelize.define(
-  "Reviews",
+  "Review",
   {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: User,
-        key: "id",
-      },
-    },
-    serviceId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: Service,
-        key: "id",
-      },
     },
     rating: {
       type: DataTypes.INTEGER,
@@ -41,5 +25,8 @@ const Review = sequelize.define(
     timestamps: true,
   }
 );
+
+Review.belongsTo(User, { foreignKey: "userId" });
+Review.belongsTo(Service, { foreignKey: "serviceId" });
 
 export default Review;

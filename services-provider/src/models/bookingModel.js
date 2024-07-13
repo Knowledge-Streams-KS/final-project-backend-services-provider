@@ -3,7 +3,6 @@ import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
 import User from "./userModel.js";
 import Service from "./serviceModel.js";
-import Provider from "./providerModel.js";
 
 const Booking = sequelize.define(
   "Booking",
@@ -26,14 +25,6 @@ const Booking = sequelize.define(
       allowNull: false,
       references: {
         model: Service,
-        key: "id",
-      },
-    },
-    providerId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      references: {
-        model: Provider,
         key: "id",
       },
     },

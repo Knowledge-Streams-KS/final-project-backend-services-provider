@@ -1,26 +1,22 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { check, validationResult } from "express-validator";
 import userModel from "../models/userModel.js";
 import crypto from "crypto";
 import sendEmail from "../utils/email.js";
 import { Op } from "sequelize";
+import userSchema from "../middlewares/schemas/userSchema.js";
 
-// Registration Controller
-const registerUser = [
-  check("firstName").not().isEmpty().withMessage("First name is required"),
-  check("email").isEmail().withMessage("Please include a valid email"),
-  check("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters"),
-  check("role")
-    .isIn(["customer", "provider"])
-    .withMessage("Role must be either 'customer' or 'provider'"),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+const userController = {
+  // Registration Controller
+  registerUser: async (req, res) => {
+    const { error } = userSchema.registerSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+      return res.status(400).json({ errors });
     }
+
     const { firstName, lastName, email, password, phoneNumber, address, role } =
       req.body;
     try {
@@ -51,21 +47,21 @@ const registerUser = [
       });
       res.status(200).json({ token });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: error.message });
+      console.error(error.message);
+      res.status(500).json({ message: "Server error" });
     }
   },
-];
 
-// Login Controller
-const loginUser = [
-  check("email").isEmail().withMessage("Please include a valid email"),
-  check("password").exists().withMessage("Password is required"),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+  // Login Controller
+  loginUser: async (req, res) => {
+    const { error } = userSchema.loginSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+      return res.status(400).json({ errors });
     }
+
     const { email, password } = req.body;
     try {
       const user = await userModel.findOne({ where: { email } });
@@ -75,48 +71,40 @@ const loginUser = [
       const token = jwt.sign(
         { userId: user.id, role: user.role },
         process.env.JWT_SECRET,
-        {
-          expiresIn: "1h",
-        }
+        { expiresIn: "1h" }
       );
       res.status(200).json({ token });
     } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: "Server error" });
     }
   },
-];
-const getUserProfile = async (req, res) => {
-  try {
-    const user = await userModel.findByPk(req.user.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: "Server error" });
-  }
-};
 
-// Update User Profile Controller
-const updateUserProfile = [
-  check("firstName")
-    .optional()
-    .not()
-    .isEmpty()
-    .withMessage("First name is required"),
-  check("email")
-    .optional()
-    .isEmail()
-    .withMessage("Please include a valid email"),
-  check("password")
-    .optional()
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters"),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+  // Get User Profile Controller
+  getUserProfile: async (req, res) => {
+    try {
+      const user = await userModel.findByPk(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ message: "Server error" });
     }
+  },
+
+  // Update User Profile Controller
+  updateUserProfile: async (req, res) => {
+    const { error } = userSchema.registerSchema.validate(req.body, {
+      allowUnknown: true,
+      presence: "optional",
+    });
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+      return res.status(400).json({ errors });
+    }
+
     const { firstName, lastName, email, password, phoneNumber, address } =
       req.body;
     try {
@@ -133,19 +121,19 @@ const updateUserProfile = [
       await user.save();
       res.status(200).json({ message: "Profile updated successfully" });
     } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: "Server error" });
     }
   },
-];
 
-// Forgot Password Controller
-const forgotPassword = [
-  check("email").isEmail().withMessage("Please include a valid email"),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+  // Forgot Password Controller
+  forgotPassword: async (req, res) => {
+    const { error } = userSchema.forgotPasswordSchema.validate(req.body);
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+      return res.status(400).json({ errors });
     }
+
     const { email } = req.body;
     try {
       const user = await userModel.findOne({ where: { email } });
@@ -159,28 +147,26 @@ const forgotPassword = [
 
       const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
       const message = `
-        <h1>You have requested a password reset</h1>
-        <p>Please go to this link to reset your password</p>
-        <a href=${resetUrl} clicktracking=off>${resetUrl}</a>
-      `;
+      <h1>You have requested a password reset</h1>
+      <p>Please go to this link to reset your password</p>
+      <a href=${resetUrl} clickTracking=off>${resetUrl}</a>
+    `;
       await sendEmail(user.email, "Password reset request", message);
       res.status(200).json({ message: "Email sent" });
     } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: "Server error" });
     }
   },
-];
 
-// Reset Password Controller
-const resetPassword = [
-  check("password")
-    .isLength({ min: 6 })
-    .withMessage("Password must be at least 6 characters"),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+  // Reset Password Controller
+  resetPassword: async (req, res) => {
+    const { error } = userSchema.resetPasswordSchema.validate(req.body);
+    if (error) {
+      const errors = error.details.map((err) => err.message);
+      return res.status(400).json({ errors });
     }
+
     const { token } = req.params;
     const { password } = req.body;
     try {
@@ -199,16 +185,10 @@ const resetPassword = [
       await user.save();
       res.status(200).json({ message: "Password reset successful" });
     } catch (error) {
+      console.error(error.message);
       res.status(500).json({ message: "Server error" });
     }
   },
-];
-
-export {
-  registerUser,
-  loginUser,
-  updateUserProfile,
-  forgotPassword,
-  resetPassword,
-  getUserProfile,
 };
+
+export default userController;

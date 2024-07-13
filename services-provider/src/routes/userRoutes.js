@@ -1,30 +1,23 @@
 import express from "express";
-import {
-  registerUser,
-  loginUser,
-  updateUserProfile,
-  forgotPassword,
-  resetPassword,
-  getUserProfile,
-} from "../controllers/userController.js";
+import userController from "../controllers/userController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const userRouter = express.Router();
 
-userRouter.post("/login", loginUser);
-userRouter.post("/register", registerUser);
-userRouter.get("/profile", authMiddleware, getUserProfile);
-userRouter.put("/profile", authMiddleware, updateUserProfile);
-userRouter.post("/forgot-password", forgotPassword);
-userRouter.post("/reset-password/:token", resetPassword);
+userRouter.post("/register", userController.registerUser);
+userRouter.post("/login", userController.loginUser);
+userRouter.get("/profile", authMiddleware, userController.getUserProfile);
+userRouter.put("/profile", authMiddleware, userController.updateUserProfile);
+userRouter.post("/forgot-password", userController.forgotPassword);
+userRouter.post("/reset-password/:token", userController.resetPassword);
 
 userRouter.get(
-  "/admin",
+  "/provider",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("provider"),
   (req, res) => {
-    res.send("Admin content");
+    res.send("provider content");
   }
 );
 

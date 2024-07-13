@@ -1,34 +1,25 @@
 import express from "express";
-import {
-  createCategory,
-  getCategories,
-  updateCategory,
-  deleteCategory,
-} from "../controllers/categoryController.js";
+import categoryController from "../controllers/categoryController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import roleMiddleware from "../middlewares/roleMiddleware.js";
 
 const categoryRouter = express.Router();
 
 categoryRouter.post(
-  "/create",
+  "/create-category",
   authMiddleware,
-  roleMiddleware("admin"),
-  createCategory
+  categoryController.createCategory
 );
-categoryRouter.get("/", getCategories);
 
+categoryRouter.get("/", authMiddleware, categoryController.getCategories);
 categoryRouter.put(
-  "/:id",
+  "/update-category/:id",
   authMiddleware,
-  roleMiddleware("admin"),
-  updateCategory
+  categoryController.updateCategory
 );
 categoryRouter.delete(
-  "/:id",
+  "/delete-category/:id",
   authMiddleware,
-  roleMiddleware("admin"),
-  deleteCategory
+  categoryController.deleteCategory
 );
 
 export default categoryRouter;
