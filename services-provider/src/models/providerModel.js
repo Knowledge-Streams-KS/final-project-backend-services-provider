@@ -1,4 +1,4 @@
-// src/models/providerModel.js
+// providerModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
 
@@ -13,6 +13,11 @@ const Provider = sequelize.define("Provider", {
     allowNull: false,
   },
   contact: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  name: {
+    // Ensure this column is defined
     type: DataTypes.STRING,
     allowNull: false,
   },

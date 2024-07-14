@@ -17,5 +17,6 @@ bookingRouter.put(
 );
 
 bookingRouter.get("/", authMiddleware, bookingController.getAllBookings);
+bookingRouter.get("/:id", authMiddleware, bookingController.getBookingById);
 
 export default bookingRouter;

@@ -1,4 +1,3 @@
-// src/models/reviewModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
 import User from "./userModel.js";

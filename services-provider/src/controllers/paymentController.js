@@ -1,4 +1,4 @@
-import paymentModel from "../models/paymentModel.js";
+import Payment from "../models/paymentModel.js";
 import paymentSchema from "../middlewares/schemas/paymentSchema.js";
 
 const paymentController = {
@@ -11,7 +11,7 @@ const paymentController = {
     const { bookingId, amount, method, status } = req.body;
 
     try {
-      const payment = await paymentModel.create({
+      const payment = await Payment.create({
         bookingId,
         amount,
         method,
@@ -25,7 +25,7 @@ const paymentController = {
 
   getPayments: async (req, res) => {
     try {
-      const payments = await paymentModel.findAll();
+      const payments = await Payment.findAll();
       res.status(200).json(payments);
     } catch (error) {
       res.status(500).json({ message: error.message });

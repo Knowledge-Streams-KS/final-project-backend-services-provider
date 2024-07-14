@@ -2,6 +2,7 @@ import Booking from "../models/bookingModel.js";
 import User from "../models/userModel.js";
 import Service from "../models/serviceModel.js";
 import bookingSchema from "../middlewares/schemas/bookingSchema.js";
+import Provider from "../models/providerModel.js";
 
 const bookingController = {
   createBooking: async (req, res) => {
@@ -12,23 +13,38 @@ const bookingController = {
         .json({ errors: error.details.map((err) => err.message) });
     }
 
-    const { userId, serviceId, date, time } = req.body;
+    const {
+      userId,
+      serviceId,
+      date,
+      time,
+      serviceAddress,
+      address,
+      phoneNumber,
+      name,
+    } = req.body;
 
     try {
-      // Check if user exists
       const user = await User.findByPk(userId);
       if (!user) {
         return res.status(400).json({ message: "Invalid user ID" });
       }
 
-      // Check if service exists
       const service = await Service.findByPk(serviceId);
       if (!service) {
         return res.status(400).json({ message: "Invalid service ID" });
       }
 
-      // Create booking
-      const booking = await Booking.create({ userId, serviceId, date, time });
+      const booking = await Booking.create({
+        userId,
+        serviceId,
+        date,
+        time,
+        serviceAddress,
+        address,
+        phoneNumber,
+        name,
+      });
 
       res.status(201).json(booking);
     } catch (error) {
@@ -71,10 +87,46 @@ const bookingController = {
           {
             model: Service,
             attributes: ["id", "serviceName", "description", "price"],
+            include: [
+              {
+                model: Provider,
+                attributes: ["name"],
+              },
+            ],
           },
         ],
       });
       res.status(200).json(bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error); // Log the error
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getBookingById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const booking = await Booking.findByPk(id, {
+        include: [
+          { model: User, attributes: ["id", "firstName", "lastName", "email"] },
+          {
+            model: Service,
+            attributes: ["id", "serviceName", "description", "price"],
+            include: [
+              {
+                model: Provider,
+                attributes: ["name"],
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!booking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      res.status(200).json(booking);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

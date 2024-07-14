@@ -25,25 +25,21 @@ const serviceController = {
     } = req.body;
 
     try {
-      // Check if category exists
       const category = await Category.findByPk(categoryId);
       if (!category) {
         return res.status(400).json({ message: "Invalid category" });
       }
 
-      // Check if location exists
       const location = await Location.findByPk(locationId);
       if (!location) {
         return res.status(400).json({ message: "Invalid location" });
       }
 
-      // Check if provider exists
       const provider = await Provider.findByPk(providerId);
       if (!provider) {
         return res.status(400).json({ message: "Invalid provider" });
       }
 
-      // Create service
       const service = await Service.create({
         serviceName,
         description,
@@ -65,48 +61,7 @@ const serviceController = {
     try {
       const services = await Service.findAll({
         where: { categoryId: category },
-        include: [
-          {
-            model: Category,
-            attributes: ["categoryName"],
-          },
-        ],
-      });
-      res.status(200).json(services);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  },
-  getServicesByName: async (req, res) => {
-    const { name } = req.params;
-
-    try {
-      const services = await Service.findAll({ where: { name } });
-      res.status(200).json(services);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-
-  getServicesByLocation: async (req, res) => {
-    const { location } = req.params;
-
-    try {
-      const services = await Service.findAll({
-        where: { locationId: location },
-      });
-      res.status(200).json(services);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  },
-
-  getServicesByProvider: async (req, res) => {
-    const { provider } = req.params;
-
-    try {
-      const services = await Service.findAll({
-        where: { providerId: provider },
+        include: [{ model: Category, attributes: ["categoryName"] }],
       });
       res.status(200).json(services);
     } catch (error) {
@@ -117,16 +72,30 @@ const serviceController = {
   getAllServices: async (req, res) => {
     try {
       const services = await Service.findAll({
-        include: [
-          {
-            model: Category,
-            attributes: ["categoryName"],
-          },
-        ],
+        include: [{ model: Category, attributes: ["categoryName"] }],
       });
       res.status(200).json(services);
-    } catch (err) {
-      res.status(500).json({ error: err.message });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getServiceById: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const service = await Service.findByPk(id, {
+        include: [
+          { model: Provider, attributes: ["name"] }, // Updated attribute name
+          { model: Category, attributes: ["categoryName"] },
+          { model: Location, attributes: ["name"] },
+        ],
+      });
+      if (!service) {
+        return res.status(404).json({ message: "Service not found" });
+      }
+      res.status(200).json(service);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 };

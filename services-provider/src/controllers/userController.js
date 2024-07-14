@@ -1,13 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import userModel from "../models/userModel.js";
+import User from "../models/userModel.js";
 import crypto from "crypto";
 import sendEmail from "../utils/email.js";
 import { Op } from "sequelize";
 import userSchema from "../middlewares/schemas/userSchema.js";
 
 const userController = {
-  // Registration Controller
   registerUser: async (req, res) => {
     const { error } = userSchema.registerSchema.validate(req.body, {
       abortEarly: false,
@@ -20,12 +19,12 @@ const userController = {
     const { firstName, lastName, email, password, phoneNumber, address, role } =
       req.body;
     try {
-      let user = await userModel.findOne({ where: { email } });
+      let user = await User.findOne({ where: { email } });
       if (user) {
         return res.status(400).json({ message: "User already exists" });
       }
       const hashedPassword = await bcrypt.hash(password, 10);
-      user = await userModel.create({
+      user = await User.create({
         firstName,
         lastName,
         email,
@@ -45,14 +44,15 @@ const userController = {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "1h",
       });
-      res.status(200).json({ token });
+      res
+        .status(200)
+        .json({ token, user: { id: user.id, name: user.firstName } });
     } catch (error) {
       console.error(error.message);
       res.status(500).json({ message: "Server error" });
     }
   },
 
-  // Login Controller
   loginUser: async (req, res) => {
     const { error } = userSchema.loginSchema.validate(req.body, {
       abortEarly: false,
@@ -64,7 +64,7 @@ const userController = {
 
     const { email, password } = req.body;
     try {
-      const user = await userModel.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email } });
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(401).json({ message: "Invalid email or password" });
       }
@@ -73,17 +73,18 @@ const userController = {
         process.env.JWT_SECRET,
         { expiresIn: "1h" }
       );
-      res.status(200).json({ token });
+      res
+        .status(200)
+        .json({ token, user: { id: user.id, name: user.firstName } });
     } catch (error) {
       console.error(error.message);
       res.status(500).json({ message: "Server error" });
     }
   },
 
-  // Get User Profile Controller
   getUserProfile: async (req, res) => {
     try {
-      const user = await userModel.findByPk(req.user.id);
+      const user = await User.findByPk(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -94,7 +95,6 @@ const userController = {
     }
   },
 
-  // Update User Profile Controller
   updateUserProfile: async (req, res) => {
     const { error } = userSchema.registerSchema.validate(req.body, {
       allowUnknown: true,
@@ -108,7 +108,7 @@ const userController = {
     const { firstName, lastName, email, password, phoneNumber, address } =
       req.body;
     try {
-      const user = await userModel.findByPk(req.user.id);
+      const user = await User.findByPk(req.user.id);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -126,7 +126,6 @@ const userController = {
     }
   },
 
-  // Forgot Password Controller
   forgotPassword: async (req, res) => {
     const { error } = userSchema.forgotPasswordSchema.validate(req.body);
     if (error) {
@@ -136,7 +135,7 @@ const userController = {
 
     const { email } = req.body;
     try {
-      const user = await userModel.findOne({ where: { email } });
+      const user = await User.findOne({ where: { email } });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -159,7 +158,6 @@ const userController = {
     }
   },
 
-  // Reset Password Controller
   resetPassword: async (req, res) => {
     const { error } = userSchema.resetPasswordSchema.validate(req.body);
     if (error) {
@@ -170,7 +168,7 @@ const userController = {
     const { token } = req.params;
     const { password } = req.body;
     try {
-      const user = await userModel.findOne({
+      const user = await User.findOne({
         where: {
           resetPasswordToken: token,
           resetPasswordExpire: { [Op.gt]: Date.now() },

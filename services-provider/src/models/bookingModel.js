@@ -1,4 +1,3 @@
-// src/models/bookingModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
 import User from "./userModel.js";
@@ -39,6 +38,22 @@ const Booking = sequelize.define(
     status: {
       type: DataTypes.STRING,
       defaultValue: "pending",
+    },
+    serviceAddress: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    address: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    phoneNumber: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {

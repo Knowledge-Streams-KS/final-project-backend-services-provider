@@ -10,7 +10,7 @@ categoryRouter.post(
   categoryController.createCategory
 );
 
-categoryRouter.get("/", authMiddleware, categoryController.getCategories);
+categoryRouter.get("/", categoryController.getCategories);
 categoryRouter.put(
   "/update-category/:id",
   authMiddleware,

@@ -9,10 +9,6 @@ providerRouter.post(
   authMiddleware,
   providerController.createProvider
 );
-providerRouter.get(
-  "/get-provider",
-  authMiddleware,
-  providerController.getProviders
-);
+providerRouter.get("/get-provider", providerController.getProviders);
 
 export default providerRouter;

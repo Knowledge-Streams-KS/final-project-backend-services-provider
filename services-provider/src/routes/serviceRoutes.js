@@ -15,15 +15,8 @@ serviceRouter.get(
   "/category/:category",
   serviceController.getServicesByCategory
 );
-serviceRouter.get("/name/:name", serviceController.getServicesByName);
-serviceRouter.get(
-  "/location/:location",
-  serviceController.getServicesByLocation
-);
-serviceRouter.get(
-  "/provider/:provider",
-  serviceController.getServicesByProvider
-);
+
 serviceRouter.get("/", serviceController.getAllServices);
+serviceRouter.get("/:id", authMiddleware, serviceController.getServiceById);
 
 export default serviceRouter;

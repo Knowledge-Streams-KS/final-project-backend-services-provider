@@ -9,10 +9,6 @@ locationRouter.post(
   authMiddleware,
   locationController.createLocation
 );
-locationRouter.get(
-  "/get-location",
-  authMiddleware,
-  locationController.getLocation
-);
+locationRouter.get("/get-location", locationController.getLocation);
 
 export default locationRouter;

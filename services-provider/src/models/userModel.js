@@ -1,4 +1,3 @@
-// src/models/userModel.js
 import { DataTypes } from "sequelize";
 import sequelize from "../db/config.js";
 
@@ -33,7 +32,6 @@ const User = sequelize.define(
     },
     role: {
       type: DataTypes.STRING,
-      allowNull: null,
       defaultValue: "customer",
     },
     resetPasswordToken: {

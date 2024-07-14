@@ -2,7 +2,6 @@ import Category from "../models/categoryModels.js";
 import createCategorySchema from "../middlewares/schemas/categorySchema.js";
 
 const categoryController = {
-  // Create Category
   createCategory: async (req, res) => {
     const { error } = createCategorySchema.validate(req.body);
     if (error) {
@@ -14,7 +13,6 @@ const categoryController = {
     const { categoryName } = req.body;
 
     try {
-      // Check if category already exists
       const existingCategory = await Category.findOne({
         where: { categoryName },
       });
@@ -22,7 +20,6 @@ const categoryController = {
         return res.status(400).json({ message: "Category already exists" });
       }
 
-      // Create new category
       const category = await Category.create({ categoryName });
       res.status(201).json(category);
     } catch (error) {
@@ -30,7 +27,6 @@ const categoryController = {
     }
   },
 
-  // Get Categories
   getCategories: async (req, res) => {
     try {
       const categories = await Category.findAll();
@@ -40,7 +36,6 @@ const categoryController = {
     }
   },
 
-  // Update Category
   updateCategory: async (req, res) => {
     const { id } = req.params;
     const { error } = createCategorySchema.validate(req.body);
@@ -66,7 +61,6 @@ const categoryController = {
     }
   },
 
-  // Delete Category
   deleteCategory: async (req, res) => {
     const { id } = req.params;
 
