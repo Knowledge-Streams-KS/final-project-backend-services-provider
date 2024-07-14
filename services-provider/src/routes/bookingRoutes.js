@@ -1,3 +1,4 @@
+// bookingRoutes.js
 import express from "express";
 import bookingController from "../controllers/bookingController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -9,13 +10,11 @@ bookingRouter.post(
   authMiddleware,
   bookingController.createBooking
 );
-
 bookingRouter.put(
   "/reschedule-booking/:id",
   authMiddleware,
   bookingController.rescheduleBooking
 );
-
 bookingRouter.get("/", authMiddleware, bookingController.getAllBookings);
 bookingRouter.get("/:id", authMiddleware, bookingController.getBookingById);
 
