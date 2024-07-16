@@ -1,10 +1,12 @@
+// bookingController.js
+
 import Booking from "../models/bookingModel.js";
 import User from "../models/userModel.js";
 import Service from "../models/serviceModel.js";
-import bookingSchema from "../middlewares/schemas/bookingSchema.js";
 import Provider from "../models/providerModel.js";
 import Location from "../models/locationModel.js";
 import Category from "../models/categoryModels.js";
+import bookingSchema from "../middlewares/schemas/bookingSchema.js";
 
 const bookingController = {
   createBooking: async (req, res) => {
@@ -90,10 +92,9 @@ const bookingController = {
             model: Service,
             attributes: ["id", "serviceName", "description", "price"],
             include: [
-              {
-                model: Provider,
-                attributes: ["name"],
-              },
+              { model: Provider, attributes: ["name"] },
+              { model: Category, attributes: ["categoryName"] },
+              { model: Location, attributes: ["name"] },
             ],
           },
         ],
@@ -143,6 +144,33 @@ const bookingController = {
       res.status(200).json(booking);
     } catch (error) {
       console.error("Error fetching booking:", error); // Log the error
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getUserBookings: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      console.log("User ID:", userId); // Log the user ID
+
+      const bookings = await Booking.findAll({
+        where: { userId },
+        include: [
+          { model: User, attributes: ["id", "firstName", "lastName", "email"] },
+          {
+            model: Service,
+            attributes: ["id", "serviceName", "description", "price"],
+            include: [
+              { model: Provider, attributes: ["name"] },
+              { model: Category, attributes: ["categoryName"] },
+              { model: Location, attributes: ["name"] },
+            ],
+          },
+        ],
+      });
+      res.status(200).json(bookings);
+    } catch (error) {
+      console.error("Error fetching user bookings:", error);
       res.status(500).json({ error: error.message });
     }
   },

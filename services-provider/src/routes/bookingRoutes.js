@@ -15,7 +15,12 @@ bookingRouter.put(
   authMiddleware,
   bookingController.rescheduleBooking
 );
-bookingRouter.get("/", authMiddleware, bookingController.getAllBookings);
+bookingRouter.get(
+  "/user-bookings",
+  authMiddleware,
+  bookingController.getUserBookings
+); // Add this line
 bookingRouter.get("/:id", authMiddleware, bookingController.getBookingById);
+bookingRouter.get("/", authMiddleware, bookingController.getAllBookings);
 
 export default bookingRouter;

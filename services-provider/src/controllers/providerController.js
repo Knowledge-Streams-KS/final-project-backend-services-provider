@@ -3,9 +3,12 @@ import createProviderSchema from "../middlewares/schemas/providerSchema.js";
 
 const providerController = {
   createProvider: async (req, res) => {
-    const { error } = createProviderSchema.validate(req.body, {
-      abortEarly: false,
-    });
+    const { error } = createProviderSchema.createProviderSchema.validate(
+      req.body,
+      {
+        abortEarly: false,
+      }
+    );
     if (error) {
       return res
         .status(400)
