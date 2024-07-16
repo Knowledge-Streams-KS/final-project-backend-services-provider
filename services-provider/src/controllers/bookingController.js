@@ -3,6 +3,8 @@ import User from "../models/userModel.js";
 import Service from "../models/serviceModel.js";
 import bookingSchema from "../middlewares/schemas/bookingSchema.js";
 import Provider from "../models/providerModel.js";
+import Location from "../models/locationModel.js";
+import Category from "../models/categoryModels.js";
 
 const bookingController = {
   createBooking: async (req, res) => {
@@ -106,6 +108,8 @@ const bookingController = {
   getBookingById: async (req, res) => {
     try {
       const { id } = req.params;
+      console.log(`Fetching booking with ID: ${id}`); // Log the booking ID
+
       const booking = await Booking.findByPk(id, {
         include: [
           { model: User, attributes: ["id", "firstName", "lastName", "email"] },
@@ -117,17 +121,28 @@ const bookingController = {
                 model: Provider,
                 attributes: ["name"],
               },
+              {
+                model: Category,
+                attributes: ["categoryName"],
+              },
+              {
+                model: Location,
+                attributes: ["name"],
+              },
             ],
           },
         ],
       });
 
       if (!booking) {
+        console.log(`Booking with ID: ${id} not found`); // Log if booking is not found
         return res.status(404).json({ message: "Booking not found" });
       }
 
+      console.log("Booking found: ", booking); // Log booking details
       res.status(200).json(booking);
     } catch (error) {
+      console.error("Error fetching booking:", error); // Log the error
       res.status(500).json({ error: error.message });
     }
   },
