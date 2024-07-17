@@ -54,19 +54,25 @@ const userSchema = {
   }),
 
   forgotPasswordSchema: Joi.object({
-    email: Joi.string().trim().email().required().messages({
-      "string.email": "Please include a valid email",
-      "string.empty": "Email cannot be empty",
+    email: Joi.string().email().required().messages({
+      "string.email": "Invalid email format",
       "any.required": "Email is required",
     }),
   }),
 
   resetPasswordSchema: Joi.object({
-    password: Joi.string().trim().min(6).required().messages({
-      "string.min": "Password must be at least 6 characters",
-      "string.empty": "Password cannot be empty",
+    password: Joi.string().min(6).required().messages({
+      "string.min": "Password should be at least 6 characters long",
       "any.required": "Password is required",
     }),
+  }),
+  updateUserProfileSchema: Joi.object({
+    firstName: Joi.string().optional(),
+    lastName: Joi.string().optional(),
+    email: Joi.string().email().optional(),
+    password: Joi.string().optional(),
+    phoneNumber: Joi.string().optional(),
+    address: Joi.string().optional(),
   }),
 };
 

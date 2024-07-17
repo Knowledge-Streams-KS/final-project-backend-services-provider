@@ -10,7 +10,12 @@ userRouter.post("/login", userController.loginUser);
 userRouter.get("/profile", authMiddleware, userController.getUserProfile);
 userRouter.put("/profile", authMiddleware, userController.updateUserProfile);
 userRouter.post("/forgot-password", userController.forgotPassword);
-userRouter.post("/reset-password/:token", userController.resetPassword);
+userRouter.put("/reset-password/:token", userController.resetPassword);
+userRouter.put(
+  "/change-password/",
+  authMiddleware,
+  userController.changePassword
+);
 
 userRouter.get(
   "/provider",
