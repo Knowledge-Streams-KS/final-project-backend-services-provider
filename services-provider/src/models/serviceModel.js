@@ -48,6 +48,9 @@ const Service = sequelize.define(
         key: "id",
       },
     },
+    imageUrl: {
+      type: DataTypes.STRING,
+    },
   },
   {
     timestamps: true,

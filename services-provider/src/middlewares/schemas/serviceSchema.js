@@ -25,6 +25,7 @@ const createServiceSchema = Joi.object({
     "string.guid": "Provider ID must be a valid UUID",
     "any.required": "Provider ID is required",
   }),
+  image: Joi.any(),
 });
 
 export default { createServiceSchema };

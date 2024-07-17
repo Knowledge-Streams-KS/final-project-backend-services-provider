@@ -3,6 +3,19 @@ import Category from "../models/categoryModels.js";
 import Location from "../models/locationModel.js";
 import Provider from "../models/providerModel.js";
 import serviceSchema from "../middlewares/schemas/serviceSchema.js";
+import multer from "multer";
+import path from "path";
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const serviceController = {
   createService: async (req, res) => {
@@ -48,6 +61,7 @@ const serviceController = {
         locationId,
         providerId,
         userId: req.user.id,
+        imageUrl: req.file ? `/uploads/${req.file.filename}` : null,
       });
 
       res.status(201).json(service);
@@ -59,8 +73,14 @@ const serviceController = {
   getServicesByCategory: async (req, res) => {
     const { category } = req.params;
     try {
+      const categoryData = await Category.findOne({
+        where: { categoryName: category },
+      });
+      if (!categoryData) {
+        return res.status(404).json({ message: "Category not found" });
+      }
       const services = await Service.findAll({
-        where: { categoryId: category },
+        where: { categoryId: categoryData.id },
         include: [{ model: Category, attributes: ["categoryName"] }],
       });
       res.status(200).json(services);
@@ -85,7 +105,7 @@ const serviceController = {
     try {
       const service = await Service.findByPk(id, {
         include: [
-          { model: Provider, attributes: ["name"] }, // Updated attribute name
+          { model: Provider, attributes: ["name"] },
           { model: Category, attributes: ["categoryName"] },
           { model: Location, attributes: ["name"] },
         ],
@@ -100,4 +120,4 @@ const serviceController = {
   },
 };
 
-export default serviceController;
+export { upload, serviceController };
