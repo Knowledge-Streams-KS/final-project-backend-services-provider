@@ -129,7 +129,7 @@ const userController = {
     const { error } = userSchema.forgotPasswordSchema.validate(req.body);
     if (error) {
       const errors = error.details.map((err) => err.message);
-      console.error("Validation errors:", errors); // Log validation errors
+      console.error("Validation errors:", errors);
       return res.status(400).json({ errors });
     }
 
@@ -141,7 +141,7 @@ const userController = {
       }
       const resetToken = crypto.randomBytes(20).toString("hex");
       user.resetPasswordToken = resetToken;
-      user.resetPasswordExpire = Date.now() + 3600000; // 1 hour from now
+      user.resetPasswordExpire = Date.now() + 3600000;
       await user.save();
 
       const resetUrl = `http://localhost:3004/reset-password/${resetToken}`;
@@ -153,7 +153,7 @@ const userController = {
       await sendEmail(user.email, "Password reset request", message);
       res.status(200).json({ message: "Email sent" });
     } catch (error) {
-      console.error("Error sending reset email:", error.message); // Log error
+      console.error("Error sending reset email:", error.message);
       res.status(500).json({ message: "Server error" });
     }
   },

@@ -101,7 +101,7 @@ const bookingController = {
       });
       res.status(200).json(bookings);
     } catch (error) {
-      console.error("Error fetching bookings:", error); // Log the error
+      console.error("Error fetching bookings:", error);
       res.status(500).json({ error: error.message });
     }
   },
@@ -109,7 +109,7 @@ const bookingController = {
   getBookingById: async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(`Fetching booking with ID: ${id}`); // Log the booking ID
+      console.log(`Fetching booking with ID: ${id}`);
 
       const booking = await Booking.findByPk(id, {
         include: [
@@ -136,14 +136,14 @@ const bookingController = {
       });
 
       if (!booking) {
-        console.log(`Booking with ID: ${id} not found`); // Log if booking is not found
+        console.log(`Booking with ID: ${id} not found`);
         return res.status(404).json({ message: "Booking not found" });
       }
 
       console.log("Booking found: ", booking); // Log booking details
       res.status(200).json(booking);
     } catch (error) {
-      console.error("Error fetching booking:", error); // Log the error
+      console.error("Error fetching booking:", error);
       res.status(500).json({ error: error.message });
     }
   },
@@ -151,7 +151,7 @@ const bookingController = {
   getUserBookings: async (req, res) => {
     try {
       const userId = req.user.id;
-      console.log("User ID:", userId); // Log the user ID
+      console.log("User ID:", userId);
 
       const bookings = await Booking.findAll({
         where: { userId },
